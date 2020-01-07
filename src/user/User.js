@@ -8,7 +8,7 @@ let Storage;
 
 if (isReactNative) {
     // eslint-disable-next-line
-    Storage = require('react-native').AsyncStorage;
+    Storage = require('@react-native-community/async-storage');
 } else {
     Storage = localStorage;
 }
@@ -41,13 +41,17 @@ module.exports = {
         });
     },
     handleLogout() {
-        Storage.removeItem(TOKEN_KEY);
+        Storage.default.removeItem(TOKEN_KEY);
         Data._tokenIdSaved = null;
         this._userIdSaved = null;
     },
     loginWithPassword(selector, password, callback) {
         if (typeof selector === 'string') {
-            if (selector.indexOf('@') === -1) { selector = { username: selector }; } else { selector = { email: selector }; }
+            if (selector.indexOf('@') === -1) {
+                selector = { username: selector };
+            } else {
+                selector = { email: selector };
+            }
         }
 
         this._startLoggingIn();
@@ -93,7 +97,7 @@ module.exports = {
     },
     _handleLoginCallback(err, result) {
         if (!err) { // save user id and token
-            Storage.setItem(TOKEN_KEY, result.token);
+            Storage.default.setItem(TOKEN_KEY, result.token);
             Data._tokenIdSaved = result.token;
             this._userIdSaved = result.id;
             Data.notify('onLogin');
@@ -119,7 +123,7 @@ module.exports = {
         return Data._tokenIdSaved;
     },
     getAuthTokenFromStorage() {
-        return Storage.getItem(TOKEN_KEY);
+        return Storage.default.getItem(TOKEN_KEY);
     },
     async _loadInitialUser() {
         let value = null;
